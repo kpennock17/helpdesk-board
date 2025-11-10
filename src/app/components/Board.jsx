@@ -6,7 +6,7 @@ import SearchBox from './SearchBox';
 import TicketList from './TicketList';
 import MyQueueSummary from './MyQueueSummary';
 import StatusMessage from './StatusMessage';
-import { priorities, statuses } from '../lib/severity';
+import {priorities,statuses} from '../lib/severity';
 
 export default function Board() {
   const [tickets, setTickets] = useState([]);
@@ -15,9 +15,8 @@ export default function Board() {
 
   const [filters, setFilters] = useState({ status: 'All', priority: 'All' });
   const [search, setSearch] = useState('');
-  const [queue, setQueue] = useState({}); // map { [ticketId]: true }
+  const [queue, setQueue] = useState({});
 
-  // Fetch tickets on mount
   useEffect(() => {
     let cancelled = false;
     async function fetchTickets() {
@@ -42,13 +41,12 @@ export default function Board() {
     };
   }, []);
 
-  // Live updates effect: every 6-10 seconds randomly update one ticket
   useEffect(() => {
     if (tickets.length === 0) return;
     let active = true;
 
     function randomInterval() {
-      return 6000 + Math.floor(Math.random() * 4000); // 6000-9999 ms
+      return 6000 + Math.floor(Math.random() * 4000);
     }
 
     function pickAndMutate() {
@@ -56,14 +54,14 @@ export default function Board() {
         if (!active || prev.length === 0) return prev;
         const idx = Math.floor(Math.random() * prev.length);
         const ticket = prev[idx];
-        // Decide to change status or priority
+    
         const changeType = Math.random() < 0.6 ? 'status' : 'priority';
 
         const statusTransitions = {
           'Open': ['In Progress', 'On Hold'],
           'In Progress': ['On Hold', 'Resolved'],
           'On Hold': ['In Progress', 'Resolved'],
-          'Resolved': ['In Progress'] // reopen sometimes
+          'Resolved': ['In Progress']
         };
 
         const priorityTransitions = {
@@ -103,7 +101,6 @@ export default function Board() {
     };
   }, [tickets.length]);
 
-  // Derived visible tickets from tickets, filters, search
   const visibleTickets = useMemo(() => {
     const q = search.trim().toLowerCase();
     return tickets.filter(t => {
@@ -117,7 +114,6 @@ export default function Board() {
     });
   }, [tickets, filters, search]);
 
-  // Add/remove queue handlers
   const addToQueue = useCallback((ticketId) => {
     setQueue(prev => ({ ...prev, [ticketId]: true }));
   }, []);
@@ -134,12 +130,11 @@ export default function Board() {
     setQueue({});
   }, []);
 
-  // Render
   const isEmpty = !loading && !error && visibleTickets.length === 0;
 
   return (
     <div className="space-y-4">
-      <section className="bg-white p-4 rounded shadow flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <section className="bg-black p-4 rounded shadow flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div className="flex gap-2 items-center">
           <StatusFilter
             value={filters.status}
